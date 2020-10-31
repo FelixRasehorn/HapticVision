@@ -10,7 +10,7 @@ public class SetVibrationStrength : MonoBehaviour
     public GameObject objB;
     public SerialControllerCustomDelimiter serialController;
 
-    public float DefaultVibrationDistance = 0.1f;
+    public float DefaultVibrationDistance = 1f;
     public float DefaultVolumeDistance = 0.3f; //volume
     public byte MinStrength = 0;
     public byte MaxStrength = 255;
@@ -41,9 +41,9 @@ public class SetVibrationStrength : MonoBehaviour
         byte Strength = (byte) (pitchFactor * MaxStrength);
         byte SentStrength = CloserIsFaster ? (byte)(MaxStrength - Strength) : Strength;
         SentStrength = Strength;
-        serialController.SendSerialMessage(new byte[] {SentStrength});
+        serialController.SendSerialMessage(new byte[] { SentStrength });
 
-        Debug.Log("SentStrength " + SentStrength + " " + new byte[] { SentStrength });
+        Debug.Log("SentStrength " + SentStrength + " " + new byte[] {SentStrength});
         Debug.Log("Distance " + distance);
     }
 

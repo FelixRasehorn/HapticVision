@@ -39,6 +39,6 @@ MonoBehaviour:
     autoInitTracker: 0
     autoStartTracker: 0
   webcam:
-    deviceNameSetInEditor: 'USB-Kamera #2'
+    deviceNameSetInEditor: USB-Kamera
     turnOffWebCam: 0
     renderTextureLayer: 30
