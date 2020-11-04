@@ -1,51 +1,42 @@
-int analogPin = 13;                // LED connected to digital pin 13
+#define LED 3                // LED connected to digital pin 13
+
 bool lightOn = false;
+byte strength = 0;
 
 void setup()
 {
   Serial.begin(9600);
-  pinMode(analogPin, OUTPUT);      // sets the digital pin as output
+  pinMode(LED, OUTPUT);      // sets the digital pin as output
   pinMode(LED_BUILTIN, OUTPUT);
+  Serial.setTimeout(10);
 }
 
 
-void loop() {
- 
-
+void loop() 
+{  
   if(Serial.available())
   {
-    byte c = Serial.read();
+    strength = Serial.read(); //Serial.parseInt();
     
-    Serial.println( c );
-    analogWrite(analogPin, c );
-    if(Serial.available())
-  
-    char c = Serial.read();
-    if (c)
+    if(strength)
     {
-      if(c == 'A')
+      if(strength > 1)
       {
+        if(!lightOn) Serial.println("On");
+        
         lightOn = true;
+        analogWrite(LED, strength);
+        Serial.print("Strength: ");
+        Serial.println(strength); 
       }
-      else if(c == 'Z')
+      else
       {
+        Serial.println("Off");
         lightOn = false;
+        digitalWrite(LED, LOW);
       }
-      c = NULL;
     }
-  }
-  if(lightOn)
-  {
-    analogWrite(LED_BUILTIN, 100);
-    Serial.println("on");
-  }
-  else
-  {
-    digitalWrite(LED_BUILTIN, LOW);
-    Serial.println("off");
-    
-  }
-  
-  delay(33);        // delay in between reads for stability
 
-    }
+    delay(33);
+  }
+}
