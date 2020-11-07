@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <QCARConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="qcar_config.xsd">
   <Tracking>
+    <ImageTarget name="IMG_5900" size="10.000000 7.500000" />
     <ImageTarget name="bohne" size="10.000000 14.364407" />
+    <ImageTarget name="05_11_16b" size="10.000000 5.875000" />
+    <ImageTarget name="MATERIAL" size="10.000000 10.000000" />
+    <ImageTarget name="mettraux_exmachina_8" size="10.000000 12.474012" />
+    <ImageTarget name="images" size="10.000000 13.523316" />
+    <ImageTarget name="max1" size="10.000000 9.337349" />
+    <ImageTarget name="circle2" size="10.000000 10.840336" />
   </Tracking>
 </QCARConfig>

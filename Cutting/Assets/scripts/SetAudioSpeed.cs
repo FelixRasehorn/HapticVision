@@ -13,7 +13,7 @@ public class SetAudioSpeed : MonoBehaviour
     public float DefaultVolumeDistance = 0.3f; //volume
     public float MinPitch = 0.5f;
     public float MaxPitch = 1.5f;
-    public float VolumeMultiplyer = 3.0f;
+    public float VolumeMultiplyer = 2.0f;
     public bool CloserIsFaster = true;
 
     AudioMixerGroup pitchShifter = null;
@@ -33,7 +33,7 @@ public class SetAudioSpeed : MonoBehaviour
         float distance = Vector3.Distance(objA.transform.position, objB.transform.position);
 
         float normDistance = distance / DefaultPitchDistance;
-        float pitchFactor = normDistance; // math, e.g. = 1 + normDistance * 0.5f;
+        float pitchFactor = 1 + normDistance; // math, e.g. = 1 + normDistance * 0.5f;
 
         float volumeFactor = distance / DefaultVolumeDistance;
 

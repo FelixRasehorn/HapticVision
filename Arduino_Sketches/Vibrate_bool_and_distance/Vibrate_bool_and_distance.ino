@@ -16,7 +16,7 @@ void loop()
 {  
   if(Serial.available())
   {
-    strength = Serial.read(); //Serial.parseInt();
+    strength = Serial.read(); //Serial.parseInt(); // Serial.read();
     
     if(strength)
     {
