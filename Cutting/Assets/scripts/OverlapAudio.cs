@@ -18,6 +18,12 @@ public class OverlapAudio : MonoBehaviour
     {
         audioSourceA.clip = clipA;
         audioSourceB.clip = clipB;
+
+        audioSourceA.loop = true;
+        audioSourceB.loop = true;
+
+        audioSourceA.Play();
+        audioSourceB.Play();
     }
 
     // Update is called once per frame
