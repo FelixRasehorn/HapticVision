@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using Vuforia;
 
-public class SetVibrationStrength : MonoBehaviour, ITrackableEventHandler
+public class SetVibrationStrength : DefaultTrackableEventHandler
 {
     public GameObject objA;
     public GameObject objB;
@@ -17,8 +17,10 @@ public class SetVibrationStrength : MonoBehaviour, ITrackableEventHandler
 
     byte lastSendStrength = 0;
 
-    private void Start()
+    protected override void Start()
     {
+        base.Start();
+
         SetMinValue();
     }
 
@@ -64,20 +66,23 @@ public class SetVibrationStrength : MonoBehaviour, ITrackableEventHandler
         SetMinValue();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
+        base.OnDestroy();
+
         SetMinValue();
     }
 
-    public void OnTrackableStateChanged(TrackableBehaviour.Status previousStatus, TrackableBehaviour.Status newStatus)
+    protected override void OnTrackingFound()
     {
-        if (tracked == false && (newStatus == TrackableBehaviour.Status.DETECTED || newStatus == TrackableBehaviour.Status.TRACKED))
-        {
-            tracked = true;
-        }
-        else if (tracked && newStatus == TrackableBehaviour.Status.NO_POSE)
-        {
-            tracked = false;
-        }
+        base.OnTrackingFound();
+
+        tracked = true;
+    }
+    protected override void OnTrackingLost()
+    {
+        base.OnTrackingLost();
+
+        tracked = false;
     }
 }

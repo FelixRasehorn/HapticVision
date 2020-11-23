@@ -2,7 +2,7 @@
 using UnityEngine.Audio;
 using Vuforia;
 
-public class SetAudioSpeed : MonoBehaviour, ITrackableEventHandler
+public class SetAudioSpeed : DefaultTrackableEventHandler
 {
     public GameObject objA;
     public GameObject objB;
@@ -21,8 +21,10 @@ public class SetAudioSpeed : MonoBehaviour, ITrackableEventHandler
     private bool tracked = false;
 
     // Start is called before the first frame update
-    void Start()
+    protected override void Start()
     {
+        base.Start();
+
         pitchShifter = audioSource.outputAudioMixerGroup;
     }
 
@@ -66,15 +68,16 @@ public class SetAudioSpeed : MonoBehaviour, ITrackableEventHandler
         CloserIsFaster = !CloserIsFaster;
     }
 
-    public void OnTrackableStateChanged(TrackableBehaviour.Status previousStatus, TrackableBehaviour.Status newStatus)
+    protected override void OnTrackingFound()
     {
-        if (tracked == false && (newStatus == TrackableBehaviour.Status.DETECTED || newStatus == TrackableBehaviour.Status.TRACKED))
-        {
-            tracked = true;
-        }
-        else if (tracked && newStatus == TrackableBehaviour.Status.NO_POSE)
-        {
-            tracked = false;
-        }
+        base.OnTrackingFound();
+
+        tracked = true;
+    }
+    protected override void OnTrackingLost()
+    {
+        base.OnTrackingLost();
+
+        tracked = false;
     }
 }
