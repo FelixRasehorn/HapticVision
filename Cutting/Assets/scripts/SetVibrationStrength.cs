@@ -1,18 +1,19 @@
 ﻿using UnityEngine;
+using Vuforia;
 
-public class SetVibrationStrength : MonoBehaviour
+public class SetVibrationStrength : MonoBehaviour, ITrackableEventHandler
 {
     public GameObject objA;
     public GameObject objB;
     public SerialControllerCustomDelimiter serialController;
 
-    //public float DefaultVibrationDistance = 1f;
-    //public float DefaultVolumeDistance = 0.3f; //volume
     public byte MinStrength = 1;
     public byte MaxStrength = 255;
     public float Multiplier = 100.0f;
     public bool CloserIsFaster = true;
-    // public byte HardCodedStrength = 100;
+    public bool turnOfVibrationIfNotTracked = true;
+
+    private bool tracked = false;
 
     byte lastSendStrength = 0;
 
@@ -23,17 +24,28 @@ public class SetVibrationStrength : MonoBehaviour
 
     void Update()
     {
-        float distance = Vector3.Distance(objA.transform.position, objB.transform.position);
-
-        float strength = Mathf.Clamp(distance * Multiplier, MinStrength, MaxStrength);
-        byte sendStrength = (byte)(CloserIsFaster ? MaxStrength - strength : strength);
-        sendStrength = (byte)Mathf.Clamp(sendStrength, MinStrength, MaxStrength);
-
-        if (sendStrength != lastSendStrength)
+        if (turnOfVibrationIfNotTracked && tracked == false)
         {
-            serialController.SendSerialMessage(new byte[] { sendStrength });
-            Debug.Log($"For distance: {distance}, Send strength " + sendStrength + " " + new byte[] { sendStrength });
-            lastSendStrength = sendStrength;
+            if (lastSendStrength != 0)
+            {
+                serialController.SendSerialMessage(new byte[] { 0 });
+                lastSendStrength = 0;
+            }
+        }
+        else
+        {
+            float distance = Vector3.Distance(objA.transform.position, objB.transform.position);
+
+            float strength = Mathf.Clamp(distance * Multiplier, MinStrength, MaxStrength);
+            byte sendStrength = (byte)(CloserIsFaster ? MaxStrength - strength : strength);
+            sendStrength = (byte)Mathf.Clamp(sendStrength, MinStrength, MaxStrength);
+
+            if (sendStrength != lastSendStrength)
+            {
+                serialController.SendSerialMessage(new byte[] { sendStrength });
+                Debug.Log($"For distance: {distance}, Send strength " + sendStrength + " " + new byte[] { sendStrength });
+                lastSendStrength = sendStrength;
+            }
         }
     }
 
@@ -55,5 +67,17 @@ public class SetVibrationStrength : MonoBehaviour
     private void OnDestroy()
     {
         SetMinValue();
+    }
+
+    public void OnTrackableStateChanged(TrackableBehaviour.Status previousStatus, TrackableBehaviour.Status newStatus)
+    {
+        if (tracked == false && (newStatus == TrackableBehaviour.Status.DETECTED || newStatus == TrackableBehaviour.Status.TRACKED))
+        {
+            tracked = true;
+        }
+        else if (tracked && newStatus == TrackableBehaviour.Status.NO_POSE)
+        {
+            tracked = false;
+        }
     }
 }
