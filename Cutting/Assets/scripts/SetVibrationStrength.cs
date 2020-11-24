@@ -11,22 +11,64 @@ public class SetVibrationStrength : DefaultTrackableEventHandler
     public byte MaxStrength = 255;
     public float Multiplier = 100.0f;
     public bool CloserIsFaster = true;
-    public bool turnOfVibrationIfNotTracked = true;
+    public bool turnOffVibrationIfNotTracked = true;
 
     private bool tracked = false;
 
     byte lastSendStrength = 0;
 
+    private void Awake()
+    {
+        if (turnOffVibrationIfNotTracked)
+        {
+            StatusFilter = TrackingStatusFilter.Tracked;
+        }
+    }
+
     protected override void Start()
     {
         base.Start();
+
+        if (mTrackableBehaviour == null)
+        {
+            mTrackableBehaviour = GetComponent<TrackableBehaviour>() ?? GetComponentInParent<TrackableBehaviour>();
+
+            if (mTrackableBehaviour)
+            {
+                mTrackableBehaviour.RegisterOnTrackableStatusChanged((status) =>
+                {
+                    if (status.NewStatus == TrackableBehaviour.Status.DETECTED ||
+                        status.NewStatus == TrackableBehaviour.Status.TRACKED ||
+                        status.NewStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
+                    {
+                        OnTrackingFound();
+                    }
+                    else if (status.PreviousStatus == TrackableBehaviour.Status.TRACKED &&
+                             status.NewStatus == TrackableBehaviour.Status.NO_POSE)
+                    {
+                        OnTrackingLost();
+                    }
+                    else
+                    {
+                        // For combo of previousStatus=UNKNOWN + newStatus=UNKNOWN|NOT_FOUND
+                        // Vuforia is starting, but tracking has not been lost or found yet
+                        // Call OnTrackingLost() to hide the augmentations
+                        OnTrackingLost();
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("The TrackableBehaviour component needs to be assigned to the object itself or parent");
+            }
+        }
 
         SetMinValue();
     }
 
     void Update()
     {
-        if (turnOfVibrationIfNotTracked && tracked == false)
+        if (turnOffVibrationIfNotTracked && tracked == false)
         {
             if (lastSendStrength != 0)
             {

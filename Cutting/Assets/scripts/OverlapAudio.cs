@@ -13,20 +13,65 @@ public class OverlapAudio : DefaultTrackableEventHandler
     public float MinDistance = 0.2f;
     public float MaxDistance = 1f;
     public bool CloserIsA = true;
-    public bool turnOfAudioIfNotTracked = true;
+    public bool turnOffAudioIfNotTracked = true;
 
     private bool tracked = false;
+
+    private void Awake()
+    {
+        if (turnOffAudioIfNotTracked)
+        {
+            StatusFilter = TrackingStatusFilter.Tracked;
+        }
+    }
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
 
+        if (mTrackableBehaviour == null)
+        {
+            mTrackableBehaviour = GetComponent<TrackableBehaviour>() ?? GetComponentInParent<TrackableBehaviour>();
+
+            if (mTrackableBehaviour)
+            {
+                mTrackableBehaviour.RegisterOnTrackableStatusChanged((status) =>
+                {
+                    if (status.NewStatus == TrackableBehaviour.Status.DETECTED ||
+                        status.NewStatus == TrackableBehaviour.Status.TRACKED ||
+                        status.NewStatus == TrackableBehaviour.Status.EXTENDED_TRACKED)
+                    {
+                        OnTrackingFound();
+                    }
+                    else if (status.PreviousStatus == TrackableBehaviour.Status.TRACKED &&
+                             status.NewStatus == TrackableBehaviour.Status.NO_POSE)
+                    {
+                        OnTrackingLost();
+                    }
+                    else
+                    {
+                        // For combo of previousStatus=UNKNOWN + newStatus=UNKNOWN|NOT_FOUND
+                        // Vuforia is starting, but tracking has not been lost or found yet
+                        // Call OnTrackingLost() to hide the augmentations
+                        OnTrackingLost();
+                    }
+                });
+            }
+            else
+            {
+                Debug.LogError("The TrackableBehaviour component needs to be assigned to the object itself or parent");
+            }
+        }
+
         audioSourceA.clip = clipA;
         audioSourceB.clip = clipB;
 
         audioSourceA.loop = true;
         audioSourceB.loop = true;
+
+        audioSourceA.volume = 0;
+        audioSourceB.volume = 0;
 
         audioSourceA.Play();
         audioSourceB.Play();
@@ -35,7 +80,7 @@ public class OverlapAudio : DefaultTrackableEventHandler
     // Update is called once per frame
     void Update()
     {
-        if (turnOfAudioIfNotTracked && tracked == false)
+        if (turnOffAudioIfNotTracked && tracked == false)
         {
             audioSourceA.volume = 0;
             audioSourceB.volume = 0;
